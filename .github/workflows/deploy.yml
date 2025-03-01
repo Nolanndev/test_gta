@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploiement site statique
 
 on:
     push:
@@ -7,13 +7,29 @@ on:
     workflow_dispatch:
 
 jobs:
-    deploy:
+    test:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout repository
+            - name: Checkout du code
               uses: actions/checkout@v3
 
-            - name: Deploy files via SCP
+            - name: Installation de Node.js
+              uses: actions/setup-node@v3
+
+            - name: Installation des dépendances
+              run: npm install
+
+            - name: Exécution des tests
+              run: npm test
+
+    deploy:
+        needs: test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checking repository
+              uses: actions/checkout@v3
+
+            - name: Deploy to VPS
               uses: appleboy/scp-action@master
               with:
                   host: ${{ secrets.VPS_HOST }}
